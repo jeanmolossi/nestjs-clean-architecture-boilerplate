@@ -1,6 +1,6 @@
-# Bem vindo ao WX Catarina
+# Bem vindo ao Boilerplate
 
-Projeto direcionado à Descomplica
+Projeto direcionado à Boilerplate de backend
 
 ## Proposta
 
@@ -21,19 +21,16 @@ Ser um sistema completo de gerenciamento com as tecnologias mais atuais de merca
 Confira documentações de outras partes deste sistema
 
 - [API](./app)
-- [Sistema Web](https://bitbucket.org/w2bit/)
-- [App TV](https://bitbucket.org/w2bit/)
-- [App Mobile](https://bitbucket.org/w2bit/)
 
 # :construction_worker: Instalação
 
 **Você precisa primeiramente ter instalado o [NodeJS](https://nodejs.org/) (>= 10.13.0), o [Nest CLI](https://docs.nestjs.com/cli/overview), o [Yarn](https://yarnpkg.com/), o [Docker](https://docs.docker.com/get-docker/) e [Docker compose](https://docs.docker.com/compose/install/) e então:**
 
-`git clone https://{seu_user}@bitbucket.org/w2bit/desc-backend.git`
+`git clone https://github.com/jeanmolossi/nestjs-clean-architecture-boilerplate.git`
 
 Passo 1:
 
-`cd desc-backend/app` - acesso à pasta da api
+`cd nestjs-clean-architecture-boilerplate/app` - acesso à pasta da api
 
 Passo 2:
 
@@ -104,4 +101,5 @@ Descrição das branches:
 - `develop` - Ambiente de desenvolvimento (Agregador de branch)
 
 A **sugestão** é que para cada contribuição você crie uma nova branch no modelo: `${oq_é? feature,hotfix, refactor}/${nome_da_feature}` e faça o pull request para a branch de `develop`
+
 # nestjs-clean-architecture-boilerplate

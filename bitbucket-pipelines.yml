@@ -1,0 +1,130 @@
+#  Template NodeJS build
+
+#  This template allows you to validate your NodeJS code.
+#  The workflow allows running tests and code linting on the default branch.
+
+image: node
+
+pipelines:
+  default:
+    - step:
+        name: Test and Build
+        caches:
+          - node
+        script:
+          - echo "Running in any branch..."
+          - cd app
+          - npm install --legacy-peer-deps
+          - echo "Testing..."
+          - npm test
+
+  branches:
+    master:
+      - step:
+          name: Test and Build
+          caches:
+            - node
+          script:
+            - echo "Running in master branch..."
+            - cd app
+            - npm install --legacy-peer-deps
+            - npm test
+      - step:
+          name: Zip to upload
+          script:
+            - apt-get update
+            - apt-get install -y zip
+            - zip -r application.zip . -x node_modules\/* *.git* dist\/*
+          artifacts:
+            - application.zip
+
+      - step:
+          name: Upload to AWS
+          services:
+            - docker
+          script:
+            - echo "Uploading master branch..."
+            - pipe: atlassian/aws-code-deploy:0.5.4
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context.
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context.
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context.
+                APPLICATION_NAME: $APPLICATION_NAME
+                COMMAND: "upload" # 'upload' or 'deploy'.
+                ZIP_FILE: "application.zip"
+                S3_BUCKET: $S3_BUCKET
+                VERSION_LABEL: "api-master-1.0.0"
+
+      - step:
+          name: Deploy in AWS
+          services:
+            - docker
+          script:
+            - echo "Deploying master branch..."
+            - pipe: atlassian/aws-code-deploy:0.5.4
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context.
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context.
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context.
+                APPLICATION_NAME: $APPLICATION_NAME
+                COMMAND: "deploy" # 'upload' or 'deploy'.
+                ZIP_FILE: "application.zip"
+                S3_BUCKET: $S3_BUCKET
+                DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP
+                FILE_EXISTS_BEHAVIOR: "OVERWRITE"
+                WAIT: "true"
+                VERSION_LABEL: "api-master-1.0.0"
+    staging:
+      - step:
+          name: Test and Build
+          caches:
+            - node
+          script:
+            - echo "Running in staging branch..."
+            - cd app
+            - npm install --legacy-peer-deps
+            - npm test
+      - step:
+          name: Zip to upload
+          script:
+            - apt-get update
+            - apt-get install -y zip
+            - zip -r application.zip . -x node_modules\/* *.git* dist\/*
+          artifacts:
+            - application.zip
+      - step:
+          name: Upload to AWS
+          services:
+            - docker
+          script:
+            - echo "Uploading staging branch..."
+            - pipe: atlassian/aws-code-deploy:0.5.4
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context.
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context.
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context.
+                APPLICATION_NAME: $APPLICATION_NAME
+                COMMAND: "upload" # 'upload' or 'deploy'.
+                ZIP_FILE: "application.zip"
+                S3_BUCKET: $S3_BUCKET
+                VERSION_LABEL: "api-staging-1.0.0"
+
+      - step:
+          name: Deploy in AWS
+          services:
+            - docker
+          script:
+            - echo "Deploying staging branch..."
+            - pipe: atlassian/aws-code-deploy:0.5.4
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context.
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context.
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context.
+                APPLICATION_NAME: $APPLICATION_NAME
+                COMMAND: "deploy" # 'upload' or 'deploy'.
+                ZIP_FILE: "application.zip"
+                S3_BUCKET: $S3_BUCKET
+                DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP
+                FILE_EXISTS_BEHAVIOR: "OVERWRITE"
+                WAIT: "true"
+                VERSION_LABEL: "api-staging-1.0.0"

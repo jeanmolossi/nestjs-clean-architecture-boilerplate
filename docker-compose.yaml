@@ -1,0 +1,42 @@
+version: "3.0"
+services:
+  descomplica_api:
+    container_name: descomplica_api
+    build: ./app
+    volumes:
+      - ./app:/home/api
+      - ./app/node_modules:/home/api/node_modules
+    command: sh -c "yarn typeorm migration:run"
+    command: sh -c "yarn start:dev"
+    environment:
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_DBNAME: ${DATABASE_DBNAME}
+    ports:
+      - ${API_PORT}:${API_PORT}
+    depends_on:
+      - descomplica_postgres
+    networks:
+      descomplica_network:
+
+  descomplica_postgres:
+    container_name: descomplica_postgres
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DATABASE_DBNAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    restart: always
+    networks:
+      descomplica_network:
+volumes:
+  dev_db:
+networks:
+  descomplica_network:
